@@ -157,7 +157,6 @@ C:\Users\Admin\Downloads\Asset-Management-Project\AssetManagement.UI\obj\Debug\n
 C:\Users\Admin\Downloads\Asset-Management-Project\AssetManagement.UI\obj\Debug\net8.0\AssetManagement.UI.AssemblyInfo.cs
 C:\Users\Admin\Downloads\Asset-Management-Project\AssetManagement.UI\obj\Debug\net8.0\AssetManagement.UI.csproj.CoreCompileInputs.cache
 C:\Users\Admin\Downloads\Asset-Management-Project\AssetManagement.UI\obj\Debug\net8.0\AssetManagement.UI.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\Admin\Downloads\Asset-Management-Project\AssetManagement.UI\obj\Debug\net8.0\AssetManagement.UI.sourcelink.json
 C:\Users\Admin\Downloads\Asset-Management-Project\AssetManagement.UI\obj\Debug\net8.0\rjimswa.dswa.cache.json
 C:\Users\Admin\Downloads\Asset-Management-Project\AssetManagement.UI\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 C:\Users\Admin\Downloads\Asset-Management-Project\AssetManagement.UI\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AssetManagement.UI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bdfb7c15140def6bf81be8be93fe8db01a6c8450")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b3490c1d4f6cdd8eaf1fddcb578a923f9ccdc8ae")]
 [assembly: System.Reflection.AssemblyProductAttribute("AssetManagement.UI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AssetManagement.UI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

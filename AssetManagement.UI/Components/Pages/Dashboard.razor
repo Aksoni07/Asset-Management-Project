@@ -10,54 +10,10 @@
 <h1>Dashboard</h1>
 
 <div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Assets</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">@totalAssets</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-success shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Available</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">@availableAssets</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-info shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Assigned</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">@assignedAssets</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-warning shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Under Repair</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">@underRepairAssets</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-primary shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Assets</div><div class="h5 mb-0 font-weight-bold text-gray-800">@totalAssets</div></div></div></div></div></div>
+    <div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-success shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-success text-uppercase mb-1">Available</div><div class="h5 mb-0 font-weight-bold text-gray-800">@availableAssets</div></div></div></div></div></div>
+    <div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-info shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-info text-uppercase mb-1">Assigned</div><div class="h5 mb-0 font-weight-bold text-gray-800">@assignedAssets</div></div></div></div></div></div>
+    <div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-warning shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Under Repair</div><div class="h5 mb-0 font-weight-bold text-gray-800">@underRepairAssets</div></div></div></div></div></div>
 </div>
 
 <div class="card shadow mb-4">
@@ -65,6 +21,21 @@
         <h6 class="m-0 font-weight-bold text-primary">Asset Inventory</h6>
     </div>
     <div class="card-body">
+        <div class="row mb-3 gx-2">
+            <div class="col-md-3"><InputText class="form-control" @bind-Value="serialFilter" placeholder="Filter by Serial #" /></div>
+            <div class="col-md-3"><InputText class="form-control" @bind-Value="typeFilter" placeholder="Filter by Type" /></div>
+            <div class="col-md-3">
+                <InputSelect class="form-select" @bind-Value="statusFilter">
+                    <option value="All">All Statuses</option>
+                    <option value="Available">Available</option>
+                    <option value="Assigned">Assigned</option>
+                    <option value="Under Repair">Under Repair</option>
+                    <option value="Retired">Retired</option>
+                </InputSelect>
+            </div>
+            <div class="col-md-3"><button class="btn btn-primary w-100" @onclick="ApplyFilters">Filter</button></div>
+        </div>
+
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -75,7 +46,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var asset in allAssets)
+                @foreach (var asset in filteredAssets)
                 {
                     <tr>
                         <td>@asset.AssetName</td>
@@ -91,19 +62,19 @@
 
 
 @code {
-    private int totalAssets;
-    private int assignedAssets;
-    private int availableAssets;
-    private int underRepairAssets;
+    private int totalAssets, assignedAssets, availableAssets, underRepairAssets;
+    private IEnumerable<Asset> filteredAssets = new List<Asset>();
 
-    private IEnumerable<Asset> allAssets = new List<Asset>();
+    // Filter fields
+    private string serialFilter = "";
+    private string statusFilter = "All";
+    private string typeFilter = "";
 
     protected override async Task OnInitializedAsync()
     {
-        // Load widget data in parallel for performance
         await Task.WhenAll(
             LoadWidgetData(),
-            LoadAssetList()
+            ApplyFilters()
         );
     }
 
@@ -115,8 +86,8 @@
         underRepairAssets = await DashboardService.GetUnderRepairAssetCountAsync();
     }
 
-    private async Task LoadAssetList()
+    private async Task ApplyFilters()
     {
-        allAssets = await AssetService.GetAllAssetsAsync() ?? new List<Asset>();
+        filteredAssets = await AssetService.SearchAssetsAsync(serialFilter, statusFilter, typeFilter) ?? new List<Asset>();
     }
 }

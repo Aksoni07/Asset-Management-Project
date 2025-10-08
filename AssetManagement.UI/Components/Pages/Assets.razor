@@ -9,7 +9,11 @@
 
 <h1>Asset Management</h1>
 
-<button class="btn btn-primary mb-3" @onclick="AddNewAsset">Add New Asset</button>
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="AddNewAsset">Add New Asset</button>
+    <button class="btn btn-info" @onclick="GoToAssignPage">Assign Asset</button>
+</div>
+
 
 @if (assets == null)
 {
@@ -64,6 +68,11 @@ else
     private void AddNewAsset()
     {
         Navigation.NavigateTo("/asset/add");
+    }
+
+    private void GoToAssignPage()
+    {
+        Navigation.NavigateTo("/assets/assign");
     }
 
     private void EditAsset(int assetId)

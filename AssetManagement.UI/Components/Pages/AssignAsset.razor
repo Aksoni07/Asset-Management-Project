@@ -1,0 +1,87 @@
+@page "/assets/assign"
+@rendermode InteractiveServer
+@using AssetManagement.Core.Entities
+@using AssetManagement.BusinessLogic.Services
+@inject IAssetService AssetService
+@inject IEmployeeService EmployeeService
+@inject NavigationManager Navigation
+
+<PageTitle>Assign Asset</PageTitle>
+
+<h1>Assign Asset to Employee</h1>
+
+@if (availableAssets == null || employees == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="@assignmentModel" OnValidSubmit="HandleAssignment" FormName="AssignAssetForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="asset" class="form-label">Select Available Asset</label>
+            <InputSelect id="asset" class="form-select" @bind-Value="assignmentModel.AssetId">
+                <option value="0">-- Select an Asset --</option>
+                @foreach (var asset in availableAssets)
+                {
+                    <option value="@asset.AssetId">@asset.AssetName (@asset.SerialNumber)</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label for="employee" class="form-label">Assign to Employee</label>
+            <InputSelect id="employee" class="form-select" @bind-Value="assignmentModel.EmployeeId">
+                <option value="0">-- Select an Employee --</option>
+                @foreach (var emp in employees)
+                {
+                    <option value="@emp.EmployeeId">@emp.FullName</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notes (Optional)</label>
+            <InputTextArea id="notes" class="form-control" @bind-Value="assignmentModel.Notes" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Assign Asset</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+    </EditForm>
+}
+
+
+@code {
+    private AssignmentModel assignmentModel = new();
+    private IEnumerable<Asset> availableAssets = new List<Asset>();
+    private IEnumerable<Employee> employees = new List<Employee>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableAssets = await AssetService.GetAvailableAssetsAsync() ?? new List<Asset>();
+        employees = await EmployeeService.GetAllEmployeesAsync() ?? new List<Employee>();
+    }
+
+    private async Task HandleAssignment()
+    {
+        if (assignmentModel.AssetId > 0 && assignmentModel.EmployeeId > 0)
+        {
+            await AssetService.AssignAssetAsync(assignmentModel.AssetId, assignmentModel.EmployeeId, assignmentModel.Notes);
+            Navigation.NavigateTo("/assets");
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/assets");
+    }
+
+    public class AssignmentModel
+    {
+        public int AssetId { get; set; }
+        public int EmployeeId { get; set; }
+        public string Notes { get; set; } = string.Empty;
+    }
+}

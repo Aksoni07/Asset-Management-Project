@@ -14,5 +14,6 @@ namespace AssetManagement.BusinessLogic.Services
         // Business Logic
         Task AssignAssetAsync(int assetId, int employeeId, string notes);
         Task<IEnumerable<Asset>> GetAvailableAssetsAsync();
+        Task<IEnumerable<Asset>> SearchAssetsAsync(string? serialNumber, string? status, string? assetType);
     }
 }

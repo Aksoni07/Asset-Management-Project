@@ -1,5 +1,7 @@
 using AssetManagement.Core.Entities;
+using AssetManagement.DataAccess;
 using AssetManagement.DataAccess.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace AssetManagement.BusinessLogic.Services
 {
@@ -7,11 +9,13 @@ namespace AssetManagement.BusinessLogic.Services
     {
         private readonly IGenericRepository<Asset> _assetRepository;
         private readonly IGenericRepository<AssetAssignmentHistory> _historyRepository;
-        
-        public AssetService(IGenericRepository<Asset> assetRepository, IGenericRepository<AssetAssignmentHistory> historyRepository)
+        private readonly ApplicationDbContext _context;
+
+        public AssetService(IGenericRepository<Asset> assetRepository, IGenericRepository<AssetAssignmentHistory> historyRepository, ApplicationDbContext context)
         {
             _assetRepository = assetRepository;
             _historyRepository = historyRepository;
+            _context = context;
         }
 
         public async Task<IEnumerable<Asset>> GetAllAssetsAsync()
@@ -73,6 +77,28 @@ namespace AssetManagement.BusinessLogic.Services
             await _historyRepository.AddAsync(history);
 
             await _assetRepository.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Asset>> SearchAssetsAsync(string? serialNumber, string? status, string? assetType)
+        {
+            var query = _context.Assets.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(serialNumber))
+            {
+                query = query.Where(a => a.SerialNumber.Contains(serialNumber));
+            }
+
+            if (!string.IsNullOrWhiteSpace(status) && status != "All")
+            {
+                query = query.Where(a => a.Status == status);
+            }
+
+            if (!string.IsNullOrWhiteSpace(assetType))
+            {
+                query = query.Where(a => a.AssetType.Contains(assetType));
+            }
+
+            return await query.ToListAsync();
         }
     }
 }

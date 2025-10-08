@@ -17,5 +17,5 @@ This is a Blazor Server application for managing company assets and their assign
 
 ## Admin Credentials
 
-* **Username:** `admin@sciforn.com`
+* **Username:** `admin@abc.com`
 * **Password:** `Password123`

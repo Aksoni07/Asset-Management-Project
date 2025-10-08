@@ -1,0 +1,103 @@
+@page "/asset/add"
+@rendermode InteractiveServer
+@using AssetManagement.Core.Entities
+@using AssetManagement.BusinessLogic.Services
+@inject IAssetService AssetService
+@inject NavigationManager Navigation
+
+<PageTitle>Add Asset</PageTitle>
+
+<h1>Add Asset</h1>
+
+<EditForm Model="@asset" OnValidSubmit="HandleValidSubmit" FormName="AddAssetForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="assetName" class="form-label">Asset Name</label>
+            <InputText id="assetName" class="form-control" @bind-Value="asset.AssetName" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="assetType" class="form-label">Asset Type</label>
+            <InputText id="assetType" class="form-control" @bind-Value="asset.AssetType" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="makeModel" class="form-label">Make/Model</label>
+            <InputText id="makeModel" class="form-control" @bind-Value="asset.MakeModel" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="serialNumber" class="form-label">Serial Number</label>
+            <InputText id="serialNumber" class="form-control" @bind-Value="asset.SerialNumber" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="purchaseDate" class="form-label">Purchase Date</label>
+            <InputDate id="purchaseDate" class="form-control" @bind-Value="asset.PurchaseDate" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="warrantyExpiry" class="form-label">Warranty Expiry Date</label>
+            <InputDate id="warrantyExpiry" class="form-control" @bind-Value="asset.WarrantyExpiryDate" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="condition" class="form-label">Condition</label>
+            <InputSelect id="condition" class="form-select" @bind-Value="asset.Condition">
+                <option value="New">New</option>
+                <option value="Good">Good</option>
+                <option value="Needs Repair">Needs Repair</option>
+                <option value="Damaged">Damaged</option>
+            </InputSelect>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="status" class="form-label">Status</label>
+            <InputSelect id="status" class="form-select" @bind-Value="asset.Status">
+                <option value="Available">Available</option>
+                <option value="Assigned">Assigned</option>
+                <option value="Under Repair">Under Repair</option>
+                <option value="Retired">Retired</option>
+            </InputSelect>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="specifications" class="form-label">Specifications / Details</label>
+        <InputTextArea id="specifications" class="form-control" @bind-Value="asset.Specifications" />
+    </div>
+
+    <div class="form-check mb-3">
+        <InputCheckbox id="isSpare" class="form-check-input" @bind-Value="asset.IsSpare" />
+        <label for="isSpare" class="form-check-label">Is Spare</label>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Asset</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+</EditForm>
+
+@code {
+    private Asset asset = new Asset()
+    {
+        PurchaseDate = DateTime.Now,
+        WarrantyExpiryDate = DateTime.Now.AddYears(1),
+        Condition = "New",
+        Status = "Available"
+    };
+
+    private async Task HandleValidSubmit()
+    {
+        await AssetService.AddAssetAsync(asset);
+        Navigation.NavigateTo("/assets");
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/assets");
+    }
+}

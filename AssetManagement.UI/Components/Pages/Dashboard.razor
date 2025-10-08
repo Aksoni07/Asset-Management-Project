@@ -1,0 +1,122 @@
+@page "/"
+@rendermode InteractiveServer
+@using AssetManagement.Core.Entities
+@using AssetManagement.BusinessLogic.Services
+@inject IDashboardService DashboardService
+@inject IAssetService AssetService
+
+<PageTitle>Dashboard</PageTitle>
+
+<h1>Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Assets</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@totalAssets</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Available</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@availableAssets</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Assigned</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@assignedAssets</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Under Repair</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@underRepairAssets</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Asset Inventory</h6>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Serial Number</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var asset in allAssets)
+                {
+                    <tr>
+                        <td>@asset.AssetName</td>
+                        <td>@asset.AssetType</td>
+                        <td>@asset.SerialNumber</td>
+                        <td>@asset.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@code {
+    private int totalAssets;
+    private int assignedAssets;
+    private int availableAssets;
+    private int underRepairAssets;
+
+    private IEnumerable<Asset> allAssets = new List<Asset>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load widget data in parallel for performance
+        await Task.WhenAll(
+            LoadWidgetData(),
+            LoadAssetList()
+        );
+    }
+
+    private async Task LoadWidgetData()
+    {
+        totalAssets = await DashboardService.GetTotalAssetCountAsync();
+        assignedAssets = await DashboardService.GetAssignedAssetCountAsync();
+        availableAssets = await DashboardService.GetAvailableAssetCountAsync();
+        underRepairAssets = await DashboardService.GetUnderRepairAssetCountAsync();
+    }
+
+    private async Task LoadAssetList()
+    {
+        allAssets = await AssetService.GetAllAssetsAsync() ?? new List<Asset>();
+    }
+}

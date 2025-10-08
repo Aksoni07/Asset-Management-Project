@@ -1,0 +1,78 @@
+@page "/login"
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@using AssetManagement.UI.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
+@inject IConfiguration Configuration
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Login</PageTitle>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h4>Asset Management Login</h4>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger">@errorMessage</div>
+                    }
+                    <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+                        <DataAnnotationsValidator />
+                        <div class="mb-3">
+                            <label>Username</label>
+                            <InputText class="form-control" @bind-Value="loginModel.Username" />
+                            <ValidationMessage For="() => loginModel.Username" />
+                        </div>
+                        <div class="mb-3">
+                            <label>Password</label>
+                            <InputText type="password" class="form-control" @bind-Value="loginModel.Password" />
+                            <ValidationMessage For="() => loginModel.Password" />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Log In</button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+    private string errorMessage;
+
+    private async Task HandleLogin()
+    {
+        var adminUser = Configuration.GetSection("AdminCredentials")["Username"];
+        var adminPass = Configuration.GetSection("AdminCredentials")["Password"];
+
+        if (loginModel.Username == adminUser && loginModel.Password == adminPass)
+        {
+            var userSession = new UserSession { UserName = loginModel.Username };
+            
+            // Cast the injected interface to our custom type to call the method
+            var customAuthStateProvider = (CustomAuthStateProvider)AuthStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(userSession);
+
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = "Invalid username or password.";
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required]
+        public string Username { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
+    }
+}

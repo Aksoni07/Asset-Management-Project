@@ -1,0 +1,77 @@
+@page "/employees"
+@rendermode InteractiveServer
+@using AssetManagement.Core.Entities
+@using AssetManagement.BusinessLogic.Services
+@inject IEmployeeService EmployeeService
+@inject NavigationManager Navigation
+
+<PageTitle>Employee Management</PageTitle>
+
+<h1>Employee Management</h1>
+
+<button class="btn btn-primary mb-3" @onclick="AddNewEmployee">Add New Employee</button>
+
+@if (employees == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Department</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var emp in employees)
+            {
+                <tr>
+                    <td>@emp.FullName</td>
+                    <td>@emp.Department</td>
+                    <td>@emp.Email</td>
+                    <td>@(emp.IsActive ? "Active" : "Inactive")</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" @onclick="() => EditEmployee(emp.EmployeeId)">Edit</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteEmployee(emp.EmployeeId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Employee> employees = new List<Employee>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEmployees();
+    }
+
+    private async Task LoadEmployees()
+    {
+        employees = await EmployeeService.GetAllEmployeesAsync() ?? new List<Employee>();
+        StateHasChanged();
+    }
+
+    private void AddNewEmployee()
+    {
+        Navigation.NavigateTo("/employee/add");
+    }
+
+    private void EditEmployee(int employeeId)
+    {
+        Navigation.NavigateTo($"/employee/edit/{employeeId}");
+    }
+
+    private async Task DeleteEmployee(int employeeId)
+    {
+        await EmployeeService.DeleteEmployeeAsync(employeeId);
+        await LoadEmployees();
+    }
+}

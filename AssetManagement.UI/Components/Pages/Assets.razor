@@ -1,0 +1,79 @@
+@page "/assets"
+@rendermode InteractiveServer
+@using AssetManagement.Core.Entities
+@using AssetManagement.BusinessLogic.Services
+@inject IAssetService AssetService
+@inject NavigationManager Navigation
+
+<PageTitle>Asset Management</PageTitle>
+
+<h1>Asset Management</h1>
+
+<button class="btn btn-primary mb-3" @onclick="AddNewAsset">Add New Asset</button>
+
+@if (assets == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Asset Name</th>
+                <th>Type</th>
+                <th>Serial Number</th>
+                <th>Status</th>
+                <th>Condition</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var asset in assets)
+            {
+                <tr>
+                    <td>@asset.AssetName</td>
+                    <td>@asset.AssetType</td>
+                    <td>@asset.SerialNumber</td>
+                    <td>@asset.Status</td>
+                    <td>@asset.Condition</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" @onclick="() => EditAsset(asset.AssetId)">Edit</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteAsset(asset.AssetId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Asset> assets = new List<Asset>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAssets();
+    }
+
+    private async Task LoadAssets()
+    {
+        assets = await AssetService.GetAllAssetsAsync() ?? new List<Asset>();
+        StateHasChanged();
+    }
+
+    private void AddNewAsset()
+    {
+        Navigation.NavigateTo("/asset/add");
+    }
+
+    private void EditAsset(int assetId)
+    {
+        Navigation.NavigateTo($"/asset/edit/{assetId}");
+    }
+
+    private async Task DeleteAsset(int assetId)
+    {
+        await AssetService.DeleteAssetAsync(assetId);
+        await LoadAssets();
+    }
+}

@@ -4,8 +4,8 @@ using AssetManagement.DataAccess.Repositories;
 using AssetManagement.UI.Components;
 using Microsoft.EntityFrameworkCore;
 using AssetManagement.UI.Data;
-using Microsoft.AspNetCore.Components.Authorization; // Add this
-using AssetManagement.UI.Auth; // Add this
+using Microsoft.AspNetCore.Components.Authorization;
+using AssetManagement.UI.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,18 +18,16 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddAuthorizationCore();
 
-
-// 1. Configure DBContext from appsettings.json
+// 1. Configure DBContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// 2. Register Repositories and Services for Dependency Injection
+// 2. Register Repositories and Services
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-
 
 var app = builder.Build();
 

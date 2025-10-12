@@ -4,7 +4,7 @@ namespace AssetManagement.BusinessLogic.Services
     {
         Task<int> GetTotalAssetCountAsync();
         Task<int> GetAssignedAssetCountAsync();
-        Task<int> GetAvailableAssetCountAsync();
+        Task<int> GetAvailableAssetsAsync();
         Task<int> GetUnderRepairAssetCountAsync();
         Task<int> GetRetiredAssetCountAsync();
         Task<int> GetSpareAssetCountAsync();

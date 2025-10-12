@@ -1,0 +1,52 @@
+@page "/assets/history/{AssetId:int}"
+@using AssetManagement.Core.Entities
+@using AssetManagement.BusinessLogic.Services
+@inject IAssetService AssetService
+
+<PageTitle>Asset History</PageTitle>
+
+@if (asset == null || history == null)
+{
+    <p><em>Loading history...</em></p>
+}
+else
+{
+    <h1>History for: @asset.AssetName</h1>
+    <h5 class="text-muted mb-4">Serial #: @asset.SerialNumber</h5>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Assigned To</th>
+                <th>Assigned Date</th>
+                <th>Returned Date</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in history)
+            {
+                <tr>
+                    <td>@record.Employee.FullName</td>
+                    <td>@record.AssignedDate.ToString("yyyy-MM-dd")</td>
+                    <td>@record.ReturnedDate?.ToString("yyyy-MM-dd")</td>
+                    <td>@record.Notes</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int AssetId { get; set; }
+
+    private Asset? asset;
+    private IEnumerable<AssetAssignmentHistory> history = new List<AssetAssignmentHistory>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        asset = await AssetService.GetAssetByIdAsync(AssetId);
+        history = await AssetService.GetAssignmentHistoryAsync(AssetId);
+    }
+}

@@ -1,0 +1,68 @@
+@page "/reports/warranty-expiry"
+@using AssetManagement.Core.Entities
+@using AssetManagement.BusinessLogic.Services
+@inject IAssetService AssetService
+
+<PageTitle>Warranty Expiry Report</PageTitle>
+
+<h1>Warranty Expiry Report</h1>
+<p>Showing assets with warranties expiring in the next <strong>@daysUntilExpiry</strong> days.</p>
+
+<div class="row mb-3 align-items-end">
+    <div class="col-md-3">
+        <label for="days" class="form-label">Days Until Expiry</label>
+        <InputNumber id="days" class="form-control" @bind-Value="daysUntilExpiry" />
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary" @onclick="LoadReport">Generate Report</button>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Asset Name</th>
+            <th>Serial Number</th>
+            <th>Purchase Date</th>
+            <th>Warranty Expiry Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (expiringAssets == null)
+        {
+            <tr><td colspan="4"><em>Loading...</em></td></tr>
+        }
+        else if (!expiringAssets.Any())
+        {
+            <tr><td colspan="4">No assets found with warranties expiring in this period.</td></tr>
+        }
+        else
+        {
+            @foreach (var asset in expiringAssets)
+            {
+                <tr>
+                    <td>@asset.AssetName</td>
+                    <td>@asset.SerialNumber</td>
+                    <td>@asset.PurchaseDate.ToString("yyyy-MM-dd")</td>
+                    <td>@asset.WarrantyExpiryDate.ToString("yyyy-MM-dd")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    private int daysUntilExpiry = 365; // Default to one year
+    private IEnumerable<Asset>? expiringAssets;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadReport();
+    }
+
+    private async Task LoadReport()
+    {
+        expiringAssets = null; // Show loading message
+        expiringAssets = await AssetService.GetAssetsNearingWarrantyExpiryAsync(daysUntilExpiry);
+    }
+}

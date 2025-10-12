@@ -1,9 +1,9 @@
 @page "/login"
+@using AssetManagement.UI.Components.Layout
+@layout LoginLayout
 @attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
-@rendermode InteractiveServer
 @using System.ComponentModel.DataAnnotations
 @using AssetManagement.UI.Auth
-@using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager Navigation
 @inject IConfiguration Configuration
 @inject AuthenticationStateProvider AuthStateProvider
@@ -31,7 +31,12 @@
                         </div>
                         <div class="mb-3">
                             <label>Password</label>
-                            <InputText type="password" class="form-control" @bind-Value="loginModel.Password" />
+                            <div class="input-group">
+                                <InputText type="@(isPasswordVisible ? "text" : "password")" class="form-control" @bind-Value="loginModel.Password" />
+                                <button class="btn btn-outline-secondary" type="button" @onclick="TogglePasswordVisibility">
+                                    <span class="bi @(isPasswordVisible ? "bi-eye-slash-fill" : "bi-eye-fill")" aria-hidden="true"></span>
+                                </button>
+                            </div>
                             <ValidationMessage For="() => loginModel.Password" />
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Log In</button>
@@ -44,7 +49,8 @@
 
 @code {
     private LoginModel loginModel = new();
-    private string errorMessage;
+    private string errorMessage = string.Empty;
+    private bool isPasswordVisible = false;
 
     private async Task HandleLogin()
     {
@@ -53,12 +59,13 @@
 
         if (loginModel.Username == adminUser && loginModel.Password == adminPass)
         {
-            var userSession = new UserSession { UserName = loginModel.Username };
-            
-            // Cast the injected interface to our custom type to call the method
+            var userSession = new UserSession
+            {
+                UserName = loginModel.Username,
+                ExpiryTimestamp = DateTime.UtcNow.AddMinutes(60)
+            };
             var customAuthStateProvider = (CustomAuthStateProvider)AuthStateProvider;
             await customAuthStateProvider.UpdateAuthenticationState(userSession);
-
             Navigation.NavigateTo("/");
         }
         else
@@ -67,11 +74,15 @@
         }
     }
 
+    private void TogglePasswordVisibility()
+    {
+        isPasswordVisible = !isPasswordVisible;
+    }
+
     public class LoginModel
     {
         [Required]
         public string Username { get; set; } = string.Empty;
-
         [Required]
         public string Password { get; set; } = string.Empty;
     }

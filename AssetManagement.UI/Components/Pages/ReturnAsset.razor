@@ -1,0 +1,66 @@
+@page "/assets/return"
+@using AssetManagement.Core.Entities
+@using AssetManagement.BusinessLogic.Services
+@inject IAssetService AssetService
+@inject NavigationManager Navigation
+
+<PageTitle>Return Asset</PageTitle>
+
+<h1>Return an Assigned Asset</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Asset Name</th>
+            <th>Serial Number</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (assignedAssets == null)
+        {
+            <tr><td colspan="3"><em>Loading assigned assets...</em></td></tr>
+        }
+        else if (!assignedAssets.Any())
+        {
+            <tr><td colspan="3">No assets are currently assigned.</td></tr>
+        }
+        else
+        {
+            @foreach (var asset in assignedAssets)
+            {
+                <tr>
+                    <td>@asset.AssetName</td>
+                    <td>@asset.SerialNumber</td>
+                    <td>
+                        <button class="btn btn-sm btn-success" @onclick="() => HandleReturn(asset.AssetId)">Return</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Asset> assignedAssets = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAssignedAssets();
+    }
+
+    private async Task LoadAssignedAssets()
+    {
+        // Use our search service to find only "Assigned" assets
+        var result = await AssetService.SearchAssetsAsync(null, "Assigned", null, null, 1, 1000, "Name", true);
+        assignedAssets = result.Items;
+    }
+
+    private async Task HandleReturn(int assetId)
+    {
+        await AssetService.ReturnAssetAsync(assetId);
+        // Refresh the list on the page after returning an asset
+        await LoadAssignedAssets();
+        StateHasChanged();
+    }
+}

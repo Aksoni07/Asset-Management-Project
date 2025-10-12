@@ -24,7 +24,7 @@ namespace AssetManagement.BusinessLogic.Services
             return await _db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Assets WHERE Status = 'Assigned'");
         }
 
-        public async Task<int> GetAvailableAssetCountAsync()
+        public async Task<int> GetAvailableAssetsAsync()
         {
             return await _db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Assets WHERE Status = 'Available'");
         }
@@ -51,10 +51,9 @@ namespace AssetManagement.BusinessLogic.Services
             return queryResult.ToDictionary(r => r.AssetType, r => r.Count);
         }
 
-        // A small private class to hold the query result
         private class AssetTypeCount
         {
-            public string AssetType { get; set; }
+            public string AssetType { get; set; } = string.Empty;
             public int Count { get; set; }
         }
     }

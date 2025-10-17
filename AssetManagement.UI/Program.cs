@@ -6,12 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using AssetManagement.UI.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using AssetManagement.UI.Auth;
+using AssetManagement.UI.Services; 
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args); // Web server setup, Load config from appsetting
 
-// Add services to the container.
+// Add services to the container : configures the application to run in Blazor Server mode
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents(); //Blazor server service on:  server will manage the UI
 
 // Add Auth services
 builder.Services.AddCascadingAuthenticationState();
@@ -28,22 +29,25 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<CsvExportService>();
 
-var app = builder.Build();
+var app = builder.Build(); // creates the actual web application object
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline : howv errors are handled in a production
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
-}
+}// shows a user-friendly error page 
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseAntiforgery();
 
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+//security &  utility middlewares
+app.UseHttpsRedirection(); // Redirects HTTP requests to HTTPS.
+app.UseStaticFiles();      // Allows serving files from the wwwroot folder (CSS, JS, images).
+app.UseAntiforgery();        // Adds protection against cross-site request forgery attacks.
 
-DataSeeder.Seed(app);
+app.MapRazorComponents<App>() // handle all requests , route them
+    .AddInteractiveServerRenderMode();// real-time connection
+
+DataSeeder.Seed(app); // populate the database with sample data before the application starts listening for requests.
 app.Run();

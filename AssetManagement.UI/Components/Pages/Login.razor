@@ -1,11 +1,12 @@
 @page "/login"
 @using AssetManagement.UI.Components.Layout
 @layout LoginLayout
-@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous] 
 @using System.ComponentModel.DataAnnotations
 @using AssetManagement.UI.Auth
 @inject NavigationManager Navigation
-@inject IConfiguration Configuration
+@inject IConfiguration Configuration 
+<!-- read setting appsettings.json -->
 @inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Login</PageTitle>
@@ -27,8 +28,11 @@
                         <div class="mb-3">
                             <label>Username</label>
                             <InputText class="form-control" @bind-Value="loginModel.Username" />
+
                             <ValidationMessage For="() => loginModel.Username" />
+
                         </div>
+                        
                         <div class="mb-3">
                             <label>Password</label>
                             <div class="input-group">
@@ -37,9 +41,13 @@
                                     <span class="bi @(isPasswordVisible ? "bi-eye-slash-fill" : "bi-eye-fill")" aria-hidden="true"></span>
                                 </button>
                             </div>
+
                             <ValidationMessage For="() => loginModel.Password" />
+
                         </div>
+
                         <button type="submit" class="btn btn-primary w-100">Log In</button>
+
                     </EditForm>
                 </div>
             </div>
@@ -48,7 +56,7 @@
 </div>
 
 @code {
-    private LoginModel loginModel = new();
+    private LoginModel loginModel = new(); // to store data submitted from user
     private string errorMessage = string.Empty;
     private bool isPasswordVisible = false;
 

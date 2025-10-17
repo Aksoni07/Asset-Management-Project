@@ -54,9 +54,9 @@ else
 
 
 @code {
-    private AssignmentModel assignmentModel = new();
-    private IEnumerable<Asset> availableAssets = new List<Asset>();
-    private IEnumerable<Employee> employees = new List<Employee>();
+    private AssignmentModel assignmentModel = new(); // empty object to hold form data : AssetId , EmpId
+    private IEnumerable<Asset> availableAssets = new List<Asset>(); // empty List to Hold availableAssets
+    private IEnumerable<Employee> employees = new List<Employee>(); // empty List to Hold employees
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,7 +66,7 @@ else
 
     private async Task HandleAssignment()
     {
-        if (assignmentModel.AssetId > 0 && assignmentModel.EmployeeId > 0)
+        if (assignmentModel.AssetId > 0 && assignmentModel.EmployeeId > 0) // ensure user has selected both: Asset, Employee
         {
             await AssetService.AssignAssetAsync(assignmentModel.AssetId, assignmentModel.EmployeeId, assignmentModel.Notes);
             Navigation.NavigateTo("/assets");

@@ -21,6 +21,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th>Asset ID</th>
             <th>Asset Name</th>
             <th>Serial Number</th>
             <th>Purchase Date</th>
@@ -30,17 +31,18 @@
     <tbody>
         @if (expiringAssets == null)
         {
-            <tr><td colspan="4"><em>Loading...</em></td></tr>
+            <tr><td colspan="5"><em>Loading...</em></td></tr>
         }
         else if (!expiringAssets.Any())
         {
-            <tr><td colspan="4">No assets found with warranties expiring in this period.</td></tr>
+            <tr><td colspan="5">No assets found with warranties expiring in this period.</td></tr>
         }
         else
         {
             @foreach (var asset in expiringAssets)
             {
                 <tr>
+                    <td>@asset.AssetId</td>
                     <td>@asset.AssetName</td>
                     <td>@asset.SerialNumber</td>
                     <td>@asset.PurchaseDate.ToString("yyyy-MM-dd")</td>

@@ -53,7 +53,7 @@
     {
         // Use our search service to find only "Assigned" assets
         var result = await AssetService.SearchAssetsAsync(null, "Assigned", null, null, 1, 1000, "Name", true);
-        assignedAssets = result.Items;
+        assignedAssets = result.Items; // result:[total cnt of items , list of items]
     }
 
     private async Task HandleReturn(int assetId)
@@ -61,6 +61,6 @@
         await AssetService.ReturnAssetAsync(assetId);
         // Refresh the list on the page after returning an asset
         await LoadAssignedAssets();
-        StateHasChanged();
+        StateHasChanged(); // rerender Page
     }
 }

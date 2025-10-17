@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations; //imports a built-in .NET library ----> required, StringLength
 
 namespace AssetManagement.Core.Entities
 {
@@ -32,5 +32,7 @@ namespace AssetManagement.Core.Entities
         public string Specifications { get; set; }
 
         public ICollection<AssetAssignmentHistory> AssetAssignmentHistories { get; set; }
+        // Navigation property --->  representing all assignment history records linked to this Asset.
+        // one (Asset): many (assignment histories) relationship
     }
 }

@@ -56,7 +56,7 @@ else
 
 @code {
     [Parameter]
-    public int EmployeeId { get; set; }
+    public int EmployeeId { get; set; } // capturing the value of EmpId from URL
 
     private Employee employee;
 
@@ -68,7 +68,7 @@ else
 
     private async Task HandleValidSubmit()
     {
-        // Call the Update method instead of Add
+       
         await EmployeeService.UpdateEmployeeAsync(employee);
         Navigation.NavigateTo("/employees");
     }

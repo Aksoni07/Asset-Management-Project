@@ -22,12 +22,20 @@ else
 {
     <table class="table table-striped">
         <thead>
-            <tr><th>Asset Name</th><th>Type</th><th>Serial Number</th><th>Status</th><th>Actions</th></tr>
+            <tr>
+                <th>Asset ID</th>
+                <th>Asset Name</th>
+                <th>Type</th>
+                <th>Serial Number</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
         </thead>
         <tbody>
             @foreach (var asset in assets)
             {
                 <tr>
+                    <td>@asset.AssetId</td>
                     <td>@asset.AssetName</td>
                     <td>@asset.AssetType</td>
                     <td>@asset.SerialNumber</td>

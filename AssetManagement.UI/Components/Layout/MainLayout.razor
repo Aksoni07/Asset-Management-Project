@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-@implements IDisposable
+@implements IDisposable // cleanup work for timer, prevents memory leaks
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
 @using System.Timers
@@ -29,17 +29,19 @@
     <a class="dismiss">🗙</a>
 </div>
 
+<!-- security logic -->
 @code {
     private Timer? _timer;
 
+    // first security check + starts the session timer.
     protected override async Task OnInitializedAsync()
     {
         await CheckUserIsAuthenticated();
 
         // Subscribe to navigation events to detect user activity
-        Navigation.LocationChanged += OnLocationChanged;
+        Navigation.LocationChanged += OnLocationChanged; // nevigation manager keep the refrence of MainLayout
 
-        _timer = new Timer(30 * 1000); // 30 seconds
+        _timer = new Timer(30 * 1000); // off after : 30 seconds
         _timer.Elapsed += async (sender, e) => await CheckSession();
         _timer.Start();
     }
@@ -51,6 +53,8 @@
         await customAuthStateProvider.RefreshSessionExpiration();
     }
 
+
+    // take user to login page if they are not logged in and they are not on login page
     private async Task CheckUserIsAuthenticated()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();

@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations; //imports a built-in .NET library ----> required, StringLength
 
 namespace AssetManagement.Core.Entities
 {
@@ -27,6 +27,8 @@ namespace AssetManagement.Core.Entities
         
         public bool IsActive { get; set; } = true; // Status (Active/Inactive)
         
-        public ICollection<AssetAssignmentHistory> AssetAssignmentHistories { get; set; }
+        public ICollection<AssetAssignmentHistory> AssetAssignmentHistories { get; set; } // No New column will be added : only Linkage
+        // Navigation property --->  representing all assignment history records linked to this employee.
+        // one (employee): many (assignment histories) relationship
     }
 }

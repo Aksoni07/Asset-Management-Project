@@ -1,5 +1,4 @@
 @page "/employees"
-@rendermode InteractiveServer
 @using AssetManagement.Core.Entities
 @using AssetManagement.BusinessLogic.Services
 @inject IEmployeeService EmployeeService
@@ -9,7 +8,9 @@
 
 <h1>Employee Management</h1>
 
-<button class="btn btn-primary mb-3" @onclick="AddNewEmployee">Add New Employee</button>
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="AddNewEmployee">Add New Employee</button>
+</div>
 
 @if (employees == null)
 {
@@ -20,6 +21,7 @@ else
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Employee ID</th>
                 <th>Full Name</th>
                 <th>Department</th>
                 <th>Email</th>
@@ -31,6 +33,7 @@ else
             @foreach (var emp in employees)
             {
                 <tr>
+                    <td>@emp.EmployeeId</td>
                     <td>@emp.FullName</td>
                     <td>@emp.Department</td>
                     <td>@emp.Email</td>
@@ -48,30 +51,10 @@ else
 @code {
     private IEnumerable<Employee> employees = new List<Employee>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadEmployees();
-    }
-
-    private async Task LoadEmployees()
-    {
-        employees = await EmployeeService.GetAllEmployeesAsync() ?? new List<Employee>();
-        StateHasChanged();
-    }
-
-    private void AddNewEmployee()
-    {
-        Navigation.NavigateTo("/employee/add");
-    }
-
-    private void EditEmployee(int employeeId)
-    {
-        Navigation.NavigateTo($"/employee/edit/{employeeId}");
-    }
-
-    private async Task DeleteEmployee(int employeeId)
-    {
-        await EmployeeService.DeleteEmployeeAsync(employeeId);
-        await LoadEmployees();
-    }
+    protected override async Task OnInitializedAsync() => await LoadEmployees();
+    
+    private async Task LoadEmployees() => employees = await EmployeeService.GetAllEmployeesAsync() ?? new List<Employee>();
+    private void AddNewEmployee() => Navigation.NavigateTo("/employee/add");
+    private void EditEmployee(int employeeId) => Navigation.NavigateTo($"/employee/edit/{employeeId}");
+    private async Task DeleteEmployee(int employeeId) { await EmployeeService.DeleteEmployeeAsync(employeeId); await LoadEmployees(); }
 }

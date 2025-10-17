@@ -2,9 +2,12 @@
 @using AssetManagement.Core
 @using AssetManagement.Core.Entities
 @using AssetManagement.BusinessLogic.Services
+@using AssetManagement.UI.Services
 @inject IDashboardService DashboardService
 @inject IAssetService AssetService
 @inject IEmployeeService EmployeeService
+@inject CsvExportService CsvService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -18,8 +21,9 @@
 </div>
 
 <div class="card shadow mb-4">
-    <div class="card-header py-3">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">Asset Inventory</h6>
+        <button class="btn btn-sm btn-success" @onclick="ExportToCsv">Export to CSV</button>
     </div>
     <div class="card-body">
         <div class="row mb-3 gx-2">
@@ -49,6 +53,7 @@
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th @onclick='() => SortTable("Id")' style="cursor: pointer;">Asset ID @GetSortIcon("Id")</th>
                     <th @onclick='() => SortTable("Name")' style="cursor: pointer;">Name @GetSortIcon("Name")</th>
                     <th @onclick='() => SortTable("Type")' style="cursor: pointer;">Type @GetSortIcon("Type")</th>
                     <th @onclick='() => SortTable("Serial")' style="cursor: pointer;">Serial Number @GetSortIcon("Serial")</th>
@@ -59,6 +64,7 @@
                 @foreach (var asset in pagedAssets)
                 {
                     <tr>
+                        <td>@asset.AssetId</td>
                         <td>@asset.AssetName</td>
                         <td>@asset.AssetType</td>
                         <td>@asset.SerialNumber</td>
@@ -89,17 +95,14 @@
     private List<Asset> pagedAssets = new List<Asset>();
     private IEnumerable<Employee> employees = new List<Employee>();
 
-    // Filter fields
     private string serialFilter = "";
     private string statusFilter = "All";
     private string typeFilter = "";
     private int employeeFilterId = 0;
 
-    // Sort fields
-    private string currentSortBy = "Name";
+    private string currentSortBy = "Id"; // Default sort by ID
     private bool isSortAscending = true;
 
-    // Pagination fields
     private int currentPage = 1;
     private int pageSize = 5;
     private int totalPages = 1;
@@ -107,15 +110,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.WhenAll(
-            LoadWidgetData(),
-            LoadEmployees()
-        );
+        await LoadWidgetData();
+        await LoadEmployees();
         await ApplyFiltersAndSorting();
     }
 
-    private async Task LoadWidgetData() { /* unchanged */ totalAssets = await DashboardService.GetTotalAssetCountAsync(); assignedAssets = await DashboardService.GetAssignedAssetCountAsync(); availableAssets = await DashboardService.GetAvailableAssetsAsync(); underRepairAssets = await DashboardService.GetUnderRepairAssetCountAsync(); }
-    private async Task LoadEmployees() { /* unchanged */ employees = await EmployeeService.GetAllEmployeesAsync() ?? new List<Employee>(); }
+    private async Task LoadWidgetData() { totalAssets = await DashboardService.GetTotalAssetCountAsync(); assignedAssets = await DashboardService.GetAssignedAssetCountAsync(); availableAssets = await DashboardService.GetAvailableAssetsAsync(); underRepairAssets = await DashboardService.GetUnderRepairAssetCountAsync(); }
+    private async Task LoadEmployees() { employees = await EmployeeService.GetAllEmployeesAsync() ?? new List<Employee>(); }
 
     private async Task ApplyFilters()
     {
@@ -150,5 +151,14 @@
         StateHasChanged();
     }
 
-    private string GetSortIcon(string sortBy) { /* unchanged */ if (currentSortBy != sortBy) return "↕"; return isSortAscending ? "🔼" : "🔽"; }
+    private string GetSortIcon(string sortBy) { if (currentSortBy != sortBy) return "↕"; return isSortAscending ? "🔼" : "🔽"; }
+
+    private async Task ExportToCsv()
+    {
+        // We need to fetch all filtered results for export, not just the current page
+        var allFilteredAssets = await AssetService.SearchAssetsAsync(serialFilter, statusFilter, typeFilter, employeeFilterId, 1, totalAssetCount > 0 ? totalAssetCount : 1, currentSortBy, isSortAscending);
+        var fileBytes = CsvService.ExportAssetsToCsv(allFilteredAssets.Items);
+        var fileName = $"assets-export-{DateTime.Now:yyyy-MM-dd}.csv";
+        await JSRuntime.InvokeVoidAsync("saveAsFile", fileName, Convert.ToBase64String(fileBytes));
+    }
 }

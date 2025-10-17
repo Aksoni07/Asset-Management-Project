@@ -2,8 +2,8 @@ using AssetManagement.Core;
 using AssetManagement.Core.Entities;
 using AssetManagement.DataAccess;
 using AssetManagement.DataAccess.Repositories;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore; // AsQueryable(), Include(), ToListAsync(), CountAsync(), FindAsync()
+using System.Linq.Expressions; // Expression<Func<>> :sorting: sortBy, OrderBy : Switch statement
 
 namespace AssetManagement.BusinessLogic.Services
 {
@@ -11,7 +11,7 @@ namespace AssetManagement.BusinessLogic.Services
     {
         private readonly IGenericRepository<Asset> _assetRepository;
         private readonly IGenericRepository<AssetAssignmentHistory> _historyRepository;
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context; // for complex quiries which Igeneric cant handle : Search + Sort + Filter
 
         public AssetService(IGenericRepository<Asset> assetRepository, IGenericRepository<AssetAssignmentHistory> historyRepository, ApplicationDbContext context)
         {
@@ -72,13 +72,16 @@ namespace AssetManagement.BusinessLogic.Services
             await _assetRepository.SaveChangesAsync();
         }
 
-        public async Task<PagedResult<Asset>> SearchAssetsAsync(string? serialNumber, string? status, string? assetType, int? employeeId, int pageNumber, int pageSize, string sortBy, bool isAscending)
+        public async Task<PagedResult<Asset>> SearchAssetsAsync(string? serialNumber, string? status, string? assetType, int? employeeId, int pageNumber, int pageSize, string sortBy, bool isAscending) // Total Cnt of Items , Items for Curr Page
         {
-            var query = _context.Assets.AsQueryable();
+            var query = _context.Assets.AsQueryable(); // help to build query step by step
 
             if (!string.IsNullOrWhiteSpace(serialNumber)) { query = query.Where(a => a.SerialNumber.Contains(serialNumber)); }
+
             if (!string.IsNullOrWhiteSpace(status) && status != "All") { query = query.Where(a => a.Status == status); }
+
             if (!string.IsNullOrWhiteSpace(assetType)) { query = query.Where(a => a.AssetType.Contains(assetType)); }
+
             if (employeeId.HasValue && employeeId > 0)
             {
                 var assignedAssetIds = await _context.AssetAssignmentHistories
@@ -90,11 +93,12 @@ namespace AssetManagement.BusinessLogic.Services
 
             Expression<Func<Asset, object>> keySelector = sortBy?.ToLower() switch
             {
+                "id" => a => a.AssetId,
                 "type" => a => a.AssetType,
                 "serial" => a => a.SerialNumber,
                 "status" => a => a.Status,
                 _ => a => a.AssetName,
-            };
+            };// Dynamic sorting : Expression<Func<Asset, object>> : build dynamic quiries, so Entity Framework can Understand it and translate to SQL quireis
             query = isAscending ? query.OrderBy(keySelector) : query.OrderByDescending(keySelector);
 
             var totalCount = await query.CountAsync();
@@ -105,52 +109,44 @@ namespace AssetManagement.BusinessLogic.Services
 
         public async Task<IEnumerable<AssetAssignmentHistory>> GetAssignmentHistoryAsync(int assetId)
         {
-            return await _context.AssetAssignmentHistories
-                .Include(h => h.Employee)
+            return await _context.AssetAssignmentHistories 
+            //search in tbl Asset assignment histories
+                .Include(h => h.Employee) // Join: Employee + HistoryTable --> load data of Employees
                 .Where(h => h.AssetId == assetId)
-                .OrderByDescending(h => h.AssignedDate)
-                .ToListAsync();
+                .OrderByDescending(h => h.AssignedDate) // quiry Build
+                .ToListAsync(); // quiry sent to db --> return list of Obj
         }
 
         public async Task<IEnumerable<Asset>> GetAssetsNearingWarrantyExpiryAsync(int days)
         {
             var expiryThreshold = DateTime.UtcNow.AddDays(days);
-            return await _context.Assets
+            return await _context.Assets // Search of on Asset Table
                 .Where(a => a.WarrantyExpiryDate <= expiryThreshold && a.WarrantyExpiryDate >= DateTime.UtcNow)
                 .OrderBy(a => a.WarrantyExpiryDate)
                 .ToListAsync();
         }
 
-
-
-
         public async Task ReturnAssetAsync(int assetId)
         {
-            // Find the asset itself
             var asset = await _context.Assets.FindAsync(assetId);
             if (asset == null || asset.Status != "Assigned")
             {
-                // Asset is not assigned, so nothing to return
                 return;
             }
 
-            // Find the current, active assignment record for this asset
             var currentAssignment = await _context.AssetAssignmentHistories
                 .FirstOrDefaultAsync(h => h.AssetId == assetId && h.ReturnedDate == null);
 
             if (currentAssignment != null)
             {
-                // Set the return date
                 currentAssignment.ReturnedDate = DateTime.UtcNow;
                 _context.AssetAssignmentHistories.Update(currentAssignment);
             }
 
-            // Update the asset's status back to "Available"
             asset.Status = "Available";
             _context.Assets.Update(asset);
 
-            // Save both changes to the database
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // ATOMIC TRANSACTION --> UPDATE HISTORY + CHANGE ASSET STATUR
         }
     }
 }

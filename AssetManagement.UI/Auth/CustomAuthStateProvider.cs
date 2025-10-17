@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using System.Security.Claims;
+using System.Security.Claims;// Provides the tools to create a user's identity, like a Claim for name, role EmpId
 
 namespace AssetManagement.UI.Auth
 {
@@ -8,6 +8,8 @@ namespace AssetManagement.UI.Auth
     {
         private readonly ProtectedSessionStorage _sessionStorage;
         private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+        // ClaimsPrincipal: complete identity Doc, Holds one or more identities -> check login status
+        // ClaimsIdentity: single identity, contains claims and know how the user is authanticated
 
         public CustomAuthStateProvider(ProtectedSessionStorage sessionStorage)
         {
@@ -29,8 +31,8 @@ namespace AssetManagement.UI.Auth
                     return new AuthenticationState(_anonymous);
                 }
 
-                // IMPORTANT: We NO LONGER update the timestamp here. This method now only reads the state.
-
+                
+                //builds the entire Identity of User
                 var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, userSession.UserName)
@@ -51,21 +53,21 @@ namespace AssetManagement.UI.Auth
             if (sessionResult.Success && sessionResult.Value != null)
             {
                 var userSession = sessionResult.Value;
-                userSession.ExpiryTimestamp = DateTime.UtcNow.AddMinutes(60); // Change to 20 for production
+                userSession.ExpiryTimestamp = DateTime.UtcNow.AddMinutes(60); // Updating Expiration Time from now
                 await _sessionStorage.SetAsync("UserSession", userSession);
             }
         }
 
-        // The rest of the file remains the same
+        // method to change the authantication state, Login <-->logout
         public async Task UpdateAuthenticationState(UserSession? userSession)
         {
             ClaimsPrincipal claimsPrincipal;
-            if (userSession != null)
+            if (userSession != null) // checking In
             {
-                await _sessionStorage.SetAsync("UserSession", userSession);
-                claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(ClaimTypes.Name, userSession.UserName) }));
+                await _sessionStorage.SetAsync("UserSession", userSession); // saves the user's session data , in browser's secure storage.
+                claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(ClaimTypes.Name, userSession.UserName) })); // Overall Indentity generated
             }
-            else
+            else // checking out
             {
                 await _sessionStorage.DeleteAsync("UserSession");
                 claimsPrincipal = _anonymous;
@@ -73,7 +75,7 @@ namespace AssetManagement.UI.Auth
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
         }
 
-        public async Task Logout()
+        public async Task Logout() // clear user's session data from browser's protected storage
         {
             await UpdateAuthenticationState(null);
         }

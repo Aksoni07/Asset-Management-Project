@@ -5,14 +5,14 @@ namespace AssetManagement.UI.Data
 {
     public static class DataSeeder
     {
-        public static void Seed(IApplicationBuilder app)
+        public static void Seed(IApplicationBuilder app) // app: holds the "keys" to all the services we configured in Program.cs
         {
-            using (var serviceScope = app.ApplicationServices.CreateScope())
+            using (var serviceScope = app.ApplicationServices.CreateScope()) //  isolated workspace. : lives forever not like ApplicationDbContext 
             {
                 var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
                 if (context == null) return;
 
-                // Ensure the database is created
+                // Ensure the database is created: before the seeder tries to add data to it.
                 context.Database.EnsureCreated();
 
                 // Seed Employees if the table is empty

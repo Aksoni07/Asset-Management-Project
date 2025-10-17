@@ -5,11 +5,11 @@ namespace AssetManagement.DataAccess.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context; //  Once the repository is created, its connection to the database session cannot be changed.
 
         public GenericRepository(ApplicationDbContext context)
         {
-            _context = context;
+            _context = context; // hold our DbContext instance : To Interact with DB , readonly : only constructor can assigne it value
         }
 
         public async Task AddAsync(T entity)
@@ -43,3 +43,6 @@ namespace AssetManagement.DataAccess.Repositories
         }
     }
 }
+
+
+// Implementation of IgenericRepository Rule : Methods

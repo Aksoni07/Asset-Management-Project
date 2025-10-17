@@ -1,4 +1,4 @@
-using AssetManagement.Core.Entities;
+using AssetManagement.Core.Entities; // UI will interact with this layer Not complete implementation: Abstraction
 
 namespace AssetManagement.BusinessLogic.Services
 {

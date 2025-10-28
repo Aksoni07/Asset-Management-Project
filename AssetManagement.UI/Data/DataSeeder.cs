@@ -7,7 +7,7 @@ namespace AssetManagement.UI.Data
     {
         public static void Seed(IApplicationBuilder app) // app: holds the "keys" to all the services we configured in Program.cs
         {
-            using (var serviceScope = app.ApplicationServices.CreateScope()) //  isolated workspace. : lives forever not like ApplicationDbContext 
+            using (var serviceScope = app.ApplicationServices.CreateScope()) //  isolated workspace. : lives forever not like ApplicationDbContext
             {
                 var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
                 if (context == null) return;

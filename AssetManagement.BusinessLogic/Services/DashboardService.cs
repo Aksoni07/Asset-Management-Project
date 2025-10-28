@@ -13,7 +13,8 @@ namespace AssetManagement.BusinessLogic.Services
 
         public DashboardService(IConfiguration configuration)
         {
-            _db = new SqlConnection(configuration.GetConnectionString("DefaultConnection")); // read db Connection String from 'appsettings.json'
+            _db = new SqlConnection(configuration.GetConnectionString("DefaultConnection"));
+            //read db Connection String from 'appsettings.json'
         }
 
         public async Task<int> GetTotalAssetCountAsync()
@@ -50,7 +51,8 @@ namespace AssetManagement.BusinessLogic.Services
             var queryResult = await _db.QueryAsync<AssetTypeCount>(
                 "SELECT AssetType, COUNT(*) as Count FROM Assets GROUP BY AssetType"
             );// QueryAsync: return multiple rows and columns
-            return queryResult.ToDictionary(r => r.AssetType, r => r.Count); // queryResult holds list of AssetTypeCount (List to Dict)
+            return queryResult.ToDictionary(r => r.AssetType, r => r.Count);
+            // queryResult holds list of AssetTypeCount (List to Dict)
         }
 
         private class AssetTypeCount

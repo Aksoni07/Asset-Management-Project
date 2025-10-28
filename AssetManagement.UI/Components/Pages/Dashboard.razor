@@ -1,5 +1,5 @@
 @page "/"
-@using AssetManagement.Core
+@using AssetManagement.Core 
 @using AssetManagement.Core.Entities
 @using AssetManagement.BusinessLogic.Services
 @using AssetManagement.UI.Services
@@ -7,17 +7,31 @@
 @inject IAssetService AssetService
 @inject IEmployeeService EmployeeService
 @inject CsvExportService CsvService
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JSRuntime 
+<!-- Blazor's built in service for calling JS funcns: trigger the file download-->
 
 <PageTitle>Dashboard</PageTitle>
 
 <h1>Dashboard</h1>
 
 <div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-primary shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Assets</div><div class="h5 mb-0 font-weight-bold text-gray-800">@totalAssets</div></div></div></div></div></div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                        Total Assets</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">@totalAssets</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
     <div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-success shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-success text-uppercase mb-1">Available</div><div class="h5 mb-0 font-weight-bold text-gray-800">@availableAssets</div></div></div></div></div></div>
     <div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-info shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-info text-uppercase mb-1">Assigned</div><div class="h5 mb-0 font-weight-bold text-gray-800">@assignedAssets</div></div></div></div></div></div>
-    <div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-warning shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Under Repair</div><div class="h5 mb-0 font-weight-bold text-gray-800">@underRepairAssets</div></div></div></div></div></div>
+    <div class="col-xl-3 col-md-6 mb-4"><div class="card border-left-warning shadow h-100 py-2"><div class="card-body"><div class="row no-gutters align-items-center"><div class="col mr-2"><div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Under Repair</div>
+    <div class="h5 mb-0 font-weight-bold text-gray-800">@underRepairAssets</div></div></div></div></div></div>
 </div>
 
 <div class="card shadow mb-4">
@@ -25,6 +39,7 @@
         <h6 class="m-0 font-weight-bold text-primary">Asset Inventory</h6>
         <button class="btn btn-sm btn-success" @onclick="ExportToCsv">Export to CSV</button>
     </div>
+
     <div class="card-body">
         <div class="row mb-3 gx-2">
             <div class="col-md-3"><InputText class="form-control" @bind-Value="serialFilter" placeholder="Filter by Serial #" /></div>
@@ -115,8 +130,16 @@
         await ApplyFiltersAndSorting();
     }
 
-    private async Task LoadWidgetData() { totalAssets = await DashboardService.GetTotalAssetCountAsync(); assignedAssets = await DashboardService.GetAssignedAssetCountAsync(); availableAssets = await DashboardService.GetAvailableAssetsAsync(); underRepairAssets = await DashboardService.GetUnderRepairAssetCountAsync(); }
-    private async Task LoadEmployees() { employees = await EmployeeService.GetAllEmployeesAsync() ?? new List<Employee>(); }
+    private async Task LoadWidgetData() { 
+        totalAssets = await DashboardService.GetTotalAssetCountAsync();
+        assignedAssets = await DashboardService.GetAssignedAssetCountAsync(); 
+        availableAssets = await DashboardService.GetAvailableAssetsAsync(); 
+        underRepairAssets = await DashboardService.GetUnderRepairAssetCountAsync(); 
+    }
+
+    private async Task LoadEmployees() { 
+        employees = await EmployeeService.GetAllEmployeesAsync() ?? new List<Employee>(); 
+    }
 
     private async Task ApplyFilters()
     {

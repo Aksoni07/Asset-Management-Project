@@ -8,16 +8,19 @@ namespace AssetManagement.DataAccess
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
-        // Contructor: Read Connection string from "appsetting.json" when system starts : packages it into an options object --> pass to DbContext.
+        // Contructor: Read '''Connection string''' from "appsetting.json" when system starts : packages it into an options object --> pass to DbContext.
         // Ensure how to connect with DB
 
-        public DbSet<Employee> Employees { get; set; }   // Mapping of Core Entities with Db Tables:  TablesDbSet<Employee> maps to the Employees table.
+
+        // Mapping of Core Entities with Db Tables:  TablesDbSet<Employee> maps to the Employees table.
+        public DbSet<Employee> Employees { get; set; }
         public DbSet<Asset> Assets { get; set; }
         public DbSet<AssetAssignmentHistory> AssetAssignmentHistories { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) // inBuild Method: OnModelCreating Overrided: define database rules
+        protected override void OnModelCreating(ModelBuilder modelBuilder) //InBuild Method: OnModelCreating Overrided: define database rules
         {
-            base.OnModelCreating(modelBuilder); // default Implementation : Set Relationship , check valdiation (Required), Set PK ,config Column name + Datatype
+            base.OnModelCreating(modelBuilder); 
+            //default Implementation: Set Relationship , check valdiation (Required), Set PK ,config Column name + Datatype
 
             // Configure unique constraint for SerialNumber on Asset 
             modelBuilder.Entity<Asset>()

@@ -2869,11 +2869,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Admin\\Downloads\\Asset-Management-Project\\AssetManagement.BusinessLogic\\AssetManagement.BusinessLogic.csproj",
+      "projectUniqueName": "C:\\Users\\Admin\\OneDrive\\Desktop\\Asset-Management-Project\\AssetManagement.BusinessLogic\\AssetManagement.BusinessLogic.csproj",
       "projectName": "AssetManagement.BusinessLogic",
-      "projectPath": "C:\\Users\\Admin\\Downloads\\Asset-Management-Project\\AssetManagement.BusinessLogic\\AssetManagement.BusinessLogic.csproj",
+      "projectPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\Asset-Management-Project\\AssetManagement.BusinessLogic\\AssetManagement.BusinessLogic.csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Admin\\Downloads\\Asset-Management-Project\\AssetManagement.BusinessLogic\\obj\\",
+      "outputPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\Asset-Management-Project\\AssetManagement.BusinessLogic\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2894,8 +2894,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\Admin\\Downloads\\Asset-Management-Project\\AssetManagement.DataAccess\\AssetManagement.DataAccess.csproj": {
-              "projectPath": "C:\\Users\\Admin\\Downloads\\Asset-Management-Project\\AssetManagement.DataAccess\\AssetManagement.DataAccess.csproj"
+            "C:\\Users\\Admin\\OneDrive\\Desktop\\Asset-Management-Project\\AssetManagement.DataAccess\\AssetManagement.DataAccess.csproj": {
+              "projectPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\Asset-Management-Project\\AssetManagement.DataAccess\\AssetManagement.DataAccess.csproj"
             }
           }
         }

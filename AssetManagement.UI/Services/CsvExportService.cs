@@ -3,11 +3,11 @@ using System.Text;
 
 namespace AssetManagement.UI.Services
 {
-    public class CsvExportService // take a list of C# objects --> do formatting in csv
+    public class CsvExportService // take a list of C# objects --> do Formatting in csv
     {
         public byte[] ExportAssetsToCsv(IEnumerable<Asset> assets)
         {
-            var builder = new StringBuilder();
+            var builder = new StringBuilder();//Building a large text file
             // Add the header row
             builder.AppendLine("AssetName,AssetType,MakeModel,SerialNumber,PurchaseDate,WarrantyExpiryDate,Condition,Status");
 
@@ -17,7 +17,7 @@ namespace AssetManagement.UI.Services
                 builder.AppendLine($"{Escape(asset.AssetName)},{Escape(asset.AssetType)},{Escape(asset.MakeModel)},{Escape(asset.SerialNumber)},{asset.PurchaseDate:yyyy-MM-dd},{asset.WarrantyExpiryDate:yyyy-MM-dd},{Escape(asset.Condition)},{Escape(asset.Status)}");
             }
 
-            return Encoding.UTF8.GetBytes(builder.ToString());
+            return Encoding.UTF8.GetBytes(builder.ToString());//text into the raw bytes
         }
 
         // Helper to handle commas or quotes in the data

@@ -2,7 +2,7 @@
 // and triggers a download in the browser.
 function saveAsFile(fileName, byteBase64) {
     var link = document.createElement('a'); // invisible link in browser 
-    link.download = fileName; // download the content of the link's href
+    link.download = fileName; // download the content of the link, do not nevigate
     link.href = "data:application/octet-stream;base64," + byteBase64;
     document.body.appendChild(link); //to make part of webpage
     link.click(); // save as...

@@ -13,7 +13,7 @@ namespace AssetManagement.Core.Entities
 
         [Required]
         public int EmployeeId { get; set; }
-        public Employee Employee { get; set; } // link: Asset --> AssetAssignmentHistory
+        public Employee Employee { get; set; } // link: Employee --> AssetAssignmentHistory
 
         public DateTime AssignedDate { get; set; }
         public DateTime? ReturnedDate { get; set; }

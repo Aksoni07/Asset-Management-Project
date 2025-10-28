@@ -26,7 +26,8 @@ namespace AssetManagement.BusinessLogic.Services
             int pageNumber, 
             int pageSize, 
             string sortBy, 
-            bool isAscending);  // return PagedResult object --> 1. List of assets for current Page  + 2. total number of assets (All Pages)
+            bool isAscending);
+            //return PagedResult object --> 1. List of assets for current Page  + 2. total number of assets (All Pages)
             
         // Report Methods ---> History , Warranty
         Task<IEnumerable<AssetAssignmentHistory>> GetAssignmentHistoryAsync(int assetId);

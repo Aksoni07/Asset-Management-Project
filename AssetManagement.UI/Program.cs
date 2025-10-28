@@ -15,7 +15,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents(); //Blazor server service on:  server will manage the UI
 
 // Add Auth services
-builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddCascadingAuthenticationState(); // passes the user's current login status down
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
 builder.Services.AddAuthorizationCore();
 
@@ -31,6 +31,8 @@ builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<CsvExportService>();
 
+
+//MiddleWare Pipeline
 var app = builder.Build(); // creates the actual web application object
 
 // Configure the HTTP request pipeline : howv errors are handled in a production

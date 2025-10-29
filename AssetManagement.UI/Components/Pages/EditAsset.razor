@@ -1,6 +1,7 @@
 @page "/asset/edit/{AssetId:int}"
 @using AssetManagement.Core.Entities
 @using AssetManagement.BusinessLogic.Services
+@using Microsoft.EntityFrameworkCore // Required for DbUpdateException
 @inject IAssetService AssetService
 @inject NavigationManager Navigation
 
@@ -17,6 +18,14 @@ else
     <EditForm Model="@asset" OnValidSubmit="HandleValidSubmit" FormName="EditAssetForm">
         <DataAnnotationsValidator />
         <ValidationSummary />
+
+        @* Display error message if one exists *@
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @errorMessage
+            </div>
+        }
 
         <div class="row">
             <div class="col-md-6 mb-3">
@@ -92,20 +101,32 @@ else
     public int AssetId { get; set; }
 
     private Asset? asset;
+    private string errorMessage = string.Empty; // Variable to hold the error message
 
     protected override async Task OnInitializedAsync()
     {
-        // Load the existing asset data when the page loads
         asset = await AssetService.GetAssetByIdAsync(AssetId);
     }
 
     private async Task HandleValidSubmit()
     {
-        if (asset != null)
+        if (asset == null) return; // Should not happen, but safety check
+
+        errorMessage = string.Empty; // Clear previous errors
+        try
         {
-            // Call the Update method instead of Add
             await AssetService.UpdateAssetAsync(asset);
-            Navigation.NavigateTo("/assets");
+            Navigation.NavigateTo("/assets"); // Only navigate if save is successful
+        }
+        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("IX_Assets_SerialNumber") ?? false)
+        {
+            // Specific error for duplicate serial number
+            errorMessage = $"Error: Serial number '{asset.SerialNumber}' already exists. Please use a unique serial number.";
+        }
+        catch (Exception ex)
+        {
+            // Generic error for other problems during save
+            errorMessage = $"An error occurred while updating the asset: {ex.Message}";
         }
     }
 
